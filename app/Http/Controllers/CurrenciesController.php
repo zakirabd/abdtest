@@ -14,7 +14,8 @@ class CurrenciesController extends Controller
      */
     public function index()
     {
-        //
+        return Currencies::orderBy('id', 'DESC')->get();
+
     }
 
     /**
@@ -53,7 +54,7 @@ class CurrenciesController extends Controller
      */
     public function show($id)
     {
-        //
+        return Currencies::where('id', $id)->first();
     }
 
     /**

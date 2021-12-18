@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\EducationRequests;
 use App\Models\Education;
+use App\Services\EducationService;
 use Illuminate\Http\Request;
 
 class EducationController extends Controller
@@ -13,9 +14,18 @@ class EducationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Education::with('city')->get();
+        if($request->query('country_id')){
+            $education = (new EducationService($request))->getEducationsByCountry();
+        }else{
+            $education = (new EducationService($request))->getEducations();
+        }
+
+
+
+        return response()->json($education);
+
     }
 
     /**
@@ -40,6 +50,24 @@ class EducationController extends Controller
 
             $education = new Education();
             $education->fill($request->all());
+
+            if ($request->hasFile('image')) {
+                $ext = $request->image->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->image->storeAs('public/uploads',$filename);
+                $education->image = $filename;
+            }
+
+
+            if ($request->hasFile('logo')) {
+                $ext = $request->logo->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->logo->storeAs('public/uploads',$filename);
+                $education->logo = $filename;
+            }
+
             $education->save();
 
             return response()->json(['msg' => 'Education Added Succesffully.']);
@@ -54,7 +82,7 @@ class EducationController extends Controller
      */
     public function show($id)
     {
-        //
+        return Education::where('id', $id)->with('city')->first();
     }
 
     /**
@@ -80,6 +108,22 @@ class EducationController extends Controller
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager' || auth()->user()->role == 'unirep'){
             $education = Education::findOrFail($id);
             $education->fill($request->all());
+            if ($request->hasFile('image')) {
+                $ext = $request->image->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->image->storeAs('public/uploads',$filename);
+                $education->image = $filename;
+            }
+
+
+            if ($request->hasFile('logo')) {
+                $ext = $request->logo->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->logo->storeAs('public/uploads',$filename);
+                $education->logo = $filename;
+            }
             $education->save();
 
             return response()->json(['msg' => 'Education Updated Successfully.']);

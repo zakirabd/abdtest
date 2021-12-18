@@ -28,7 +28,11 @@ class Disciplines extends Model
 
     public function getImageFullUrlAttribute()
     {
-        return null;
+        if ($this->image) {
+            return asset("/storage/uploads/{$this->image}");
+        } else {
+            return null;
+        }
     }
 
     public function user(){

@@ -14,7 +14,7 @@ class GradingSchemeController extends Controller
      */
     public function index()
     {
-        //
+        return GradingScheme::orderBy('id', 'DESC')->get();
     }
 
     /**
@@ -53,7 +53,7 @@ class GradingSchemeController extends Controller
      */
     public function show($id)
     {
-        //
+        return GradingScheme::where('id', $id)->first();
     }
 
     /**

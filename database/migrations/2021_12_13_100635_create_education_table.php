@@ -22,10 +22,16 @@ class CreateEducationTable extends Migration
             $table->string("name");
             $table->string("title");
             $table->string("description");
-            $table->string("logo");
-            $table->string("image");
+            $table->string("logo")->nullable();
+            $table->string("image")->nullable();
             $table->unsignedBigInteger('city_id')->nullable();
             $table->foreign('city_id')->on('cities')->references('id');
+            $table->unsignedBigInteger('country_id');
+            $table->foreign('country_id')->on('countries')->references('id');
+
+            $table->unsignedBigInteger('state_id')->nullable();
+            $table->foreign('state_id')->on('states')->references('id');
+
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->on('users')->references('id');
             $table->string("lang_id");

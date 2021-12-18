@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DisciplinesRequests;
 use App\Models\Disciplines;
+use App\Services\DisciplineService;
 use Illuminate\Http\Request;
 
 class DisciplinesController extends Controller
@@ -13,9 +14,16 @@ class DisciplinesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+       if($request->query_type == 'all'){
+            $disciplines = (new DisciplineService($request))->getAllDisciplines();
+       }else{
+
+            $disciplines = (new DisciplineService($request))->getDisciplines();
+
+       }
+       return response()->json($disciplines);
     }
 
     /**
@@ -39,6 +47,15 @@ class DisciplinesController extends Controller
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
             $discipline = new Disciplines();
             $discipline->fill($request->all());
+
+            if ($request->hasFile('image')) {
+                $ext = $request->image->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->image->storeAs('public/uploads',$filename);
+                $discipline->image = $filename;
+
+            }
             $discipline->save();
 
             return response()->json(['msg' => 'Discipline Added Succesffully.']);
@@ -53,7 +70,7 @@ class DisciplinesController extends Controller
      */
     public function show($id)
     {
-        //
+        return Disciplines::where('id', $id)->first();
     }
 
     /**
@@ -79,6 +96,15 @@ class DisciplinesController extends Controller
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
             $discipline = Disciplines::findOrFail($id);
             $discipline->fill($request->all());
+
+            if ($request->hasFile('image')) {
+                $ext = $request->image->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->image->storeAs('public/uploads',$filename);
+                $discipline->image = $filename;
+
+            }
             $discipline->save();
 
             return response()->json(['msg' => 'Discipline Updated Successfully.']);
@@ -94,9 +120,9 @@ class DisciplinesController extends Controller
     public function destroy($id)
     {
         if(auth()->user()->role == 'super_admin'){
-            $country = Disciplines::findOrFail($id);
-            $country->delete();
-            return response()->json(['msg' => 'Country has been deleted successfully.']);
+            $discipline = Disciplines::findOrFail($id);
+            $discipline->delete();
+            return response()->json(['msg' => 'Discipline has been deleted successfully.']);
         }
     }
 }

@@ -20,6 +20,11 @@ class CreateSpecialtyExamsTable extends Migration
             $table->unsignedBigInteger('exam_id')->nullable();
             $table->foreign('exam_id')->on('exams')->references('id');
             $table->string('over_all');
+            $table->string('end_date');
+            $table->string('section_1')->nullable();;
+            $table->string('section_2')->nullable();;
+            $table->string('section_3')->nullable();;
+            $table->string('section_4')->nullable();;
             $table->string('active')->default('1');
             $table->timestamps();
         });

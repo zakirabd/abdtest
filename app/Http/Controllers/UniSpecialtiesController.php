@@ -60,24 +60,24 @@ class UniSpecialtiesController extends Controller
             $specialty->active = $request->active;
             $specialty->save();
 
-            $exams = json_decode($request->exams, true);
-            $languages = json_decode($request->language, true);
+            // $exams = json_decode($request->exams, true);
+            // $languages = json_decode($request->language, true);
 
-            foreach($exams as $item){
-                $exam = new SpecialtyExams();
-                $exam->fill($item);
-                $exam->over_all = 6;
-                $exam->specialty_id = $specialty->id;
-                $exam->save();
-            }
+            // foreach($exams as $item){
+            //     $exam = new SpecialtyExams();
+            //     $exam->fill($item);
+            //     $exam->over_all = 6;
+            //     $exam->specialty_id = $specialty->id;
+            //     $exam->save();
+            // }
 
-            foreach($languages as $item){
-                $language = new SpecialtyLanguage();
-                $language->fill($item);
-                $language->specialty_id = $specialty->id;
-                $language->active = 1;
-                $language->save();
-            }
+            // foreach($languages as $item){
+            //     $language = new SpecialtyLanguage();
+            //     $language->fill($item);
+            //     $language->specialty_id = $specialty->id;
+            //     $language->active = 1;
+            //     $language->save();
+            // }
 
           return response()->json(['msg' => 'Specialty Added Succesffully.']);
 
@@ -93,7 +93,7 @@ class UniSpecialtiesController extends Controller
      */
     public function show($id)
     {
-        //
+        return UniSpecialties::where('id', $id)->first();
     }
 
     /**

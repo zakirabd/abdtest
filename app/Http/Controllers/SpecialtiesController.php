@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SpecialtiesRequests;
 use App\Models\Specialties;
+use App\Services\SpecialtyService;
 use Illuminate\Http\Request;
 
 class SpecialtiesController extends Controller
@@ -13,9 +14,15 @@ class SpecialtiesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if($request->query_type == 'all'){
+            $specialty = (new SpecialtyService($request))->getAllSpecialty();
+        }else{
+            $specialty = (new SpecialtyService($request))->getSpecialty();
+        }
+
+        return response()->json($specialty);
     }
 
     /**
@@ -51,7 +58,7 @@ class SpecialtiesController extends Controller
      */
     public function show($id)
     {
-        //
+        return Specialties::where('id', $id)->first();
     }
 
     /**

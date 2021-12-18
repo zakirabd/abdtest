@@ -23,7 +23,9 @@ class Education extends Model
         'lang_id',
         'active',
         'international_ranking',
-        'youtube_link'
+        'youtube_link',
+        'state_id',
+        'country_id'
     ];
 
     protected $hidden = [
@@ -31,29 +33,58 @@ class Education extends Model
         'logo',
         'image'
     ];
-    protected $appends = ['image_full_url', 'logo_full_url', 'institutional_type'];
+    protected $appends = ['image_full_url', 'logo_full_url', 'institutional_type', 'country', 'state'];
 
 
     public function getImageFullUrlAttribute()
     {
-        return null;
+        if ($this->image) {
+            return asset("/storage/uploads/{$this->image}");
+        } else {
+            return null;
+        }
     }
 
     public function getLogoFullUrlAttribute()
     {
-        return null;
+        if ($this->logo) {
+            return asset("/storage/uploads/{$this->logo}");
+        } else {
+            return null;
+        }
     }
 
     public function user(){
+
         return $this->belongsTo('App\Models\User');
+
     }
     public function city(){
+
         return $this->belongsTo('App\Models\Cities');
-        // $city = Cities::where('id', $this->city_id)->first();
-        // return $city;
     }
     public function getInstitutionalTypeAttribute(){
         $type = InstitutionalTypes::where('id', $this->type)->first();
         return $type->type;
     }
+
+
+    public function getCountryAttribute(){
+
+        $country = Countries::where('id', $this->country_id)->first();
+        return $country;
+
+    }
+    public function getStateAttribute(){
+
+
+        if($this->state_id){
+            $state = States::where('id', $this->state_id)->first();
+            return $state;
+        }else{
+            return null;
+        }
+    }
+
+
 }

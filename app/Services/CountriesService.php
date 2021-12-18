@@ -17,9 +17,6 @@ class CountriesService
     {
         $this->request = $request;
         $this->countries = Countries::query();
-        // $this->countries = $this->request->user_type;
-        // $this->user = $this->getUsers();
-
     }
 
     public function getCountries(){

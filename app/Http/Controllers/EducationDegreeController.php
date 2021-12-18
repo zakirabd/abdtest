@@ -15,7 +15,7 @@ class EducationDegreeController extends Controller
      */
     public function index()
     {
-        //
+        return EducationDegree::orderBy('id', 'DESC')->get();
     }
 
     /**
@@ -53,7 +53,7 @@ class EducationDegreeController extends Controller
      */
     public function show($id)
     {
-        //
+        return EducationDegree::where('id', $id)->first();
     }
 
     /**

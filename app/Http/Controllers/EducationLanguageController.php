@@ -14,7 +14,7 @@ class EducationLanguageController extends Controller
      */
     public function index()
     {
-        //
+        return EducationLanguage::orderBy('id', 'DESC')->get();
     }
 
     /**
@@ -54,7 +54,7 @@ class EducationLanguageController extends Controller
      */
     public function show($id)
     {
-        //
+        return EducationLanguage::where('id', $id)->first();
     }
 
     /**
@@ -99,7 +99,7 @@ class EducationLanguageController extends Controller
         if(auth()->user()->role == 'super_admin'){
             $exam = EducationLanguage::findOrFail($id);
             $exam->delete();
-            return response()->json(['msg' => 'Exams has been deleted successfully.']);
+            return response()->json(['msg' => 'Education Language has been deleted successfully.']);
         }
     }
 }

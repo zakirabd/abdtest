@@ -15,7 +15,7 @@ class ExamsController extends Controller
      */
     public function index()
     {
-        //
+        return Exams::orderBy('id', 'DESC')->get();
     }
 
     /**
@@ -55,7 +55,7 @@ class ExamsController extends Controller
      */
     public function show($id)
     {
-        //
+        return Exams::where('id', $id)->first();
     }
 
     /**

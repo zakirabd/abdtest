@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SpecialtyExams extends Model
 {
@@ -17,8 +18,14 @@ class SpecialtyExams extends Model
         'overall',
         'active'
     ];
+    protected $appends = ['sub_sections'];
 
     public function exam(){
         return $this->belongsTo("App\Models\Exams");
+    }
+
+
+    public function getSubSectionsAttribute(){
+        return SpecialtyExamSubSections::where('exam_id', $this->exam_id)->get();
     }
 }

@@ -13,11 +13,20 @@ class Exams extends Model
 
     protected $fillable = [
         'exam_type',
-        'lang_id',
+        'type',
         'active'
     ];
+    protected $appends = ['sub_sections'];
 
     public function specialty(){
         return $this->hasOne("App\Models\SpecialtyExams");
+    }
+
+    public function subsection(){
+        return $this->belongsToMany("App\Models\Exams", "exam_subsections", "exam_id", "section");
+    }
+
+    public function getSubSectionsAttribute(){
+        return ExamSubsections::where('exam_id', $this->id)->get();
     }
 }

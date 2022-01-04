@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EducationLanguage;
+use App\Models\EducationLanguageTranslate;
 use Illuminate\Http\Request;
 
 class EducationLanguageController extends Controller
@@ -12,9 +13,19 @@ class EducationLanguageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return EducationLanguage::orderBy('id', 'DESC')->get();
+        return EducationLanguageTranslate::where('lang_id', $request->lang_id? $request->lang_id:1)->with('education_language')->orderBy('id', 'DESC')->get();
+    }
+
+
+
+    public function activeDeactive(Request $request, $id){
+        $specialty = EducationLanguage::findOrFail($id);
+        $specialty->update([
+            'active' => $request->active
+        ]);
+        return response()->json(['msg' => 'Education Language updated Succesffully.']);
     }
 
     /**
@@ -36,11 +47,26 @@ class EducationLanguageController extends Controller
     public function store(Request $request)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
-            $lang = new EducationLanguage();
+            $education_language = new EducationLanguage();
 
-            $lang->fill($request->all());
+            $education_language->active = 1;
 
-            $lang->save();
+            $education_language->save();
+
+
+
+
+            $education_language_translate = new EducationLanguageTranslate();
+
+            if(isset($request->education_language_id)){
+                $education_language_translate->education_language_id = $request->education_language_id;
+            }else{
+                $education_language_translate->education_language_id = $education_language->id;
+            }
+
+            $education_language_translate->fill($request->all());
+
+            $education_language_translate->save();
 
             return response()->json(["msg" => "Education Language Added Successfully"]);
         }
@@ -52,9 +78,15 @@ class EducationLanguageController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return EducationLanguage::where('id', $id)->first();
+        $data = EducationLanguageTranslate::where('id', $id)->with('education_language')->first();
+
+
+        if(isset($request->add_lang)){
+           $data->languages = EducationLanguageTranslate::where('education_language_id', $request->education_language_id)->get();
+        }
+        return $data;
     }
 
     /**
@@ -78,11 +110,15 @@ class EducationLanguageController extends Controller
     public function update(Request $request, $id)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
-            $lang = EducationLanguage::findOrFail($id);
+            $education_language_translate = EducationLanguageTranslate::findOrFail($id);
 
-            $lang->fill($request->all());
+            $education_language = EducationLanguage::findOrFail($education_language_translate->education_language_id);
 
-            $lang->save();
+            $education_language->save();
+
+            $education_language_translate->language = $request->language;
+            $education_language_translate->active = $request->active;
+            $education_language_translate->save();
 
             return response()->json(["msg" => "Education Language Updated Successfully"]);
         }
@@ -97,8 +133,18 @@ class EducationLanguageController extends Controller
     public function destroy($id)
     {
         if(auth()->user()->role == 'super_admin'){
-            $exam = EducationLanguage::findOrFail($id);
-            $exam->delete();
+            $education_language_translate = EducationLanguageTranslate::findOrFail($id);
+            $education_language = EducationLanguage::findOrFail($education_language_translate->education_language_id);
+            $check = EducationLanguageTranslate::where('education_language_id', $education_language_translate->education_language_id)->get();
+
+            if(count($check) == 1){
+                $education_language->active ='0';
+                $education_language->save();
+                // return $check;
+            }
+
+            $education_language_translate->delete();
+
             return response()->json(['msg' => 'Education Language has been deleted successfully.']);
         }
     }

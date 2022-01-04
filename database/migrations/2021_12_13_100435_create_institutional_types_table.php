@@ -15,9 +15,9 @@ class CreateInstitutionalTypesTable extends Migration
     {
         Schema::create('institutional_types', function (Blueprint $table) {
             $table->id();
-            $table->string("type");
-            $table->string("lang_id");
+
             $table->string("active")->default('1');
+
             $table->timestamps();
         });
     }

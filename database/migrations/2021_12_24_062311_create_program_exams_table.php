@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEducationLanguageTable extends Migration
+class CreateProgramExamsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,18 @@ class CreateEducationLanguageTable extends Migration
      */
     public function up()
     {
-        Schema::create('education_language', function (Blueprint $table) {
+        Schema::create('program_exams', function (Blueprint $table) {
             $table->id();
-            $table->string('language');
-            $table->string('lang_id');
+            $table->unsignedBigInteger('program_id');
+            $table->foreign('program_id')->on('programs')->references('id');
+
+            $table->unsignedBigInteger('exam_id');
+            $table->foreign('exam_id')->on('exams')->references('id');
+
+            $table->string('over_all');
+
             $table->string('active')->default('1');
+
             $table->timestamps();
         });
     }
@@ -29,6 +36,6 @@ class CreateEducationLanguageTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('education_language');
+        Schema::dropIfExists('program_exams');
     }
 }

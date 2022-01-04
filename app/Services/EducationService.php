@@ -35,6 +35,18 @@ class EducationService
             });
         }
 
+        if($this->request->filterByState != ''){
+            $this->educations->where(function ($q){
+                $q->where('state_id', $this->request->filterByState);
+            });
+        }
+
+        if($this->request->filterByCity != ''){
+            $this->educations->where(function ($q){
+                $q->where('city_id', $this->request->filterByCity);
+            });
+        }
+
         if($this->request->filterByType != ''){
             $this->educations->where(function ($q){
                 $q->where('type', $this->request->filterByType);
@@ -46,5 +58,13 @@ class EducationService
 
     public function getEducationsByCountry(){
         return $this->educations->where('country_id', $this->request->country_id)->orderBy('id', 'DESC')->get();
+    }
+
+    public function getEducationsByCity(){
+        return $this->educations->where('city_id', $this->request->city_id)->orderBy('id', 'DESC')->get();
+    }
+
+    public function getEducationsBystate(){
+        return $this->educations->where('state_id', $this->request->city_id)->orderBy('id', 'DESC')->get();
     }
 }

@@ -28,7 +28,6 @@ class StatesRequests extends FormRequest
             'description' => 'nullable',
             'image' => 'nullable',
             'active' => 'required',
-            'country_id' => 'required',
             'lang_id' => 'required',
             'user_id' => 'required',
         ];

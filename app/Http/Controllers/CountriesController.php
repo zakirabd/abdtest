@@ -7,6 +7,7 @@ use App\Models\Countries;
 use App\Services\CountriesService;
 use Illuminate\Http\Request;
 use App\Helpers\UploadHelper;
+use App\Models\CountriesTranslate;
 
 class CountriesController extends Controller
 {
@@ -19,14 +20,24 @@ class CountriesController extends Controller
     {
 
 
-        if($request->query('page') && $request->query('keyword')){
+        if($request->query('page') && $request->query('page') != ''){
             $countries = (new CountriesService($request))->getCountries();
-        }else {
+        }else{
             $countries = (new CountriesService($request))->getAllCountries();
         }
 
+
         return response()->json($countries);
 
+    }
+    // update active deactive countries
+
+    public function activeDeactive(Request $request, $id){
+        $specialty = Countries::findOrFail($id);
+        $specialty->update([
+            'active' => $request->active
+        ]);
+        return response()->json(['msg' => 'Countries updated Succesffully.']);
     }
 
     /**
@@ -48,21 +59,41 @@ class CountriesController extends Controller
     public function store(CountriesRequests $request)
     {
        if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
-            $country = new Countries();
-            $country->fill($request->all());
+           if(!isset($request->countries)){
+                $country = new Countries();
 
-            if ($request->hasFile('image_url')) {
-                $ext = $request->image_url->extension();
-                $filename = rand(1, 100).time().'.'.$ext;
+                if ($request->hasFile('image_url')) {
+                    $ext = $request->image_url->extension();
+                    $filename = rand(1, 100).time().'.'.$ext;
 
-                $request->image_url->storeAs('public/uploads',$filename);
-                $country->image_url = $filename;
+                    $request->image_url->storeAs('public/uploads',$filename);
+                    $country->image = $filename;
 
+                }
+
+                $country->active = '1';
+                $country->save();
+           }
+
+
+            $country_translate = new CountriesTranslate();
+
+            if(isset($request->countries)){
+                $country_translate->countries_id = $request->countries_id;
+            }else{
+                $country_translate->countries_id = $country->id;
             }
 
-            $country->save();
+
+            $country_translate->name = $request->name;
+            $country_translate->description =$request->description;
+            $country_translate->lang_id = $request->lang_id;
+            $country_translate->active = $request->active;
+            $country_translate->user_id = auth()->user()->id;
+            $country_translate->save();
 
             return response()->json(['msg' => 'Country Added Succesffully.']);
+
        }
     }
 
@@ -72,10 +103,18 @@ class CountriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return Countries::where('id', $id)->first();
+        $data = CountriesTranslate::where('id', $id)->with('countries')->first();
+
+
+        if(isset($request->add_lang)){
+           $data->languages = CountriesTranslate::where('countries_id', $request->country_id)->get();
+        }
+        return $data;
     }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -88,6 +127,8 @@ class CountriesController extends Controller
         //
     }
 
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -98,22 +139,29 @@ class CountriesController extends Controller
     public function update(CountriesRequests $request, $id)
     {
        if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
-            $country = Countries::findOrFail($id);
-            $country->fill($request->all());
+
+            $translate = CountriesTranslate::findOrFail($id);
+            $country = Countries::findOrFail($request->countries_id);
+
+            // $country->fill($request->all());
+
 
             if ($request->hasFile('image_url')) {
                 $ext = $request->image_url->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->image_url->storeAs('public/uploads',$filename);
-                $country->image_url = $filename;
+                $country->image = $filename;
 
             }
-
-
             $country->save();
 
-            return response()->json(['msg' => 'Country updated successfully.']);
+            $translate->name = $request->name;
+            $translate->description = $request->description;
+            $translate->active = $request->active;
+            $translate->save();
+
+            return $translate;
        }
     }
 
@@ -123,11 +171,23 @@ class CountriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         if(auth()->user()->role == 'super_admin'){
-            $country = Countries::findOrFail($id);
-            $country->delete();
+
+
+            $country_translate = CountriesTranslate::findOrFail($id);
+            $country = Countries::findOrFail($country_translate->countries_id);
+            $check = CountriesTranslate::where('countries_id', $country_translate->countries_id)->get();
+
+            if(count($check) == 1){
+                $country->active ='0';
+                $country->save();
+                // return $check;
+            }
+
+            $country_translate->delete();
+
             return response()->json(['msg' => 'Country has been deleted successfully.']);
         }
 

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Countries;
+use App\Models\CountriesTranslate;
 
 /**
  * Class CountriesService
@@ -16,22 +17,26 @@ class CountriesService
     public function __construct($request)
     {
         $this->request = $request;
-        $this->countries = Countries::query();
+        $this->countries = CountriesTranslate::query();
     }
 
     public function getCountries(){
-         $countries = $this->countries->take($this->request->page*20)->orderBy('id', 'DESC')->get();
-        // return  Countries::get();
+
         if($this->request->keyword != ''){
-            return $this->countries->where('name', 'like', "%{$this->request->keyword}%")
-            ->orWhere('description', 'like', "%{$this->request->keyword}%")->get();
-        }else{
-            return $countries;
+            $this->countries
+            ->where('lang_id', $this->request->lang_id)
+            ->where('name', 'like', "%{$this->request->keyword}%")
+
+            ->orWhere('lang_id', $this->request->lang_id)
+            ->Where('description', 'like', "%{$this->request->keyword}%");
         }
+
+
+        return $this->countries->where('lang_id', $this->request->lang_id)->with('countries')->orderBy('id', 'DESC')->take($this->request->page * 20)->get();
 
     }
 
     public function getAllCountries(){
-        return $this->countries->orderBy('id', 'DESC')->get();
+        return $this->countries->where('lang_id', 1)->with('countries')->orderBy('id', 'DESC')->get();
     }
 }

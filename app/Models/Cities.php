@@ -11,14 +11,11 @@ class Cities extends Model
     protected $table = 'cities';
 
     protected $fillable = [
-        'name',
-        'description',
+
         'image',
         'active',
-        'lang_id',
         'country_id',
         'state_id',
-        'user_id'
     ];
 
     protected $hidden = [
@@ -37,17 +34,12 @@ class Cities extends Model
         }
     }
 
-    public function user(){
-        return $this->belongsTo('App\Models\User');
-    }
-
     public function country(){
         return $this->belongsTo('App\Models\Countries');
     }
     public function state(){
         return $this->belongsTo('App\Models\States');
     }
-    public function education(){
-        return $this->hasOne('App\Models\Education');
-    }
+
+
 }

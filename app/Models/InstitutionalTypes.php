@@ -12,7 +12,6 @@ class InstitutionalTypes extends Model
     protected $table = 'institutional_types';
 
     protected $fillable = [
-        'type',
         'active'
     ];
 

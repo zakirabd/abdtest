@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateExamsTable extends Migration
+class CreateExamSubsectionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateExamsTable extends Migration
      */
     public function up()
     {
-        Schema::create('exams', function (Blueprint $table) {
+        Schema::create('exam_subsections', function (Blueprint $table) {
             $table->id();
-            $table->string('exam_type');
-            $table->string('lang_id');
-            $table->string('active')->default('1');
+            $table->unsignedBigInteger('exam_id')->nullable();
+            $table->foreign('exam_id')->on('exams')->references('id');
+            $table->string('section');
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateExamsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('exams');
+        Schema::dropIfExists('exam_subsections');
     }
 }

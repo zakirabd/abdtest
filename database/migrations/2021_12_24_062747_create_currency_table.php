@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateGradingSchemeTable extends Migration
+class CreateCurrencyTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,13 @@ class CreateGradingSchemeTable extends Migration
      */
     public function up()
     {
-        Schema::create('grading_scheme', function (Blueprint $table) {
+        Schema::create('currency', function (Blueprint $table) {
             $table->id();
-            $table->string('type');
+
             $table->string('active')->default('1');
+            $table->string('currency');
+
+            $table->string('active')->default('0');
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ class CreateGradingSchemeTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('grading_scheme');
+        Schema::dropIfExists('currency');
     }
 }

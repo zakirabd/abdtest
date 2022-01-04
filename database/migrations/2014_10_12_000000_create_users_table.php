@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('phone_number');
             $table->string('image')->nullable();
             $table->string('role_id');
+            $table->string('access_lang')->nullable();
             $table->string('lock_status')->default("0");
             $table->timestamps();
         });

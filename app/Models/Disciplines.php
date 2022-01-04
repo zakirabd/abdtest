@@ -11,11 +11,9 @@ class Disciplines extends Model
     protected $table = 'disciplines';
 
     protected $fillable = [
-        'name',
-        'description',
+
         'image',
         'active',
-        'lang_id',
         'user_id'
     ];
 

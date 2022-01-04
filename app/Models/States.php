@@ -12,17 +12,12 @@ class States extends Model
     protected $table = 'states';
 
     protected $fillable = [
-        'name',
-        'description',
         'image',
         'active',
-        'lang_id',
-        'country_id',
-        'user_id'
+        'countries_id',
     ];
 
     protected $hidden = [
-        'user_id',
         'image'
     ];
     protected $appends = ['image_full_url'];
@@ -37,9 +32,7 @@ class States extends Model
         }
     }
 
-    public function user(){
-        return $this->belongsTo('App\Models\User');
-    }
+
 
     public function country(){
         return $this->belongsTo('App\Models\Countries');
@@ -47,4 +40,9 @@ class States extends Model
     public function city(){
         return $this->hasOne('App\Models\Cities');
     }
+
+    // public function hasMany()
+    // {
+    //     return $this->has
+    // }
 }

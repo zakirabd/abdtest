@@ -28,7 +28,7 @@ class CitiesRequests extends FormRequest
             'description' => 'nullable',
             'image' => 'nullable',
             'active' => 'required',
-            'country_id' => 'required',
+
             'lang_id' => 'required',
             'state_id' => 'nullable',
             'user_id' => 'required',

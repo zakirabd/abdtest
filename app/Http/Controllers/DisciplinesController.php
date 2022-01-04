@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\DisciplinesRequests;
 use App\Models\Disciplines;
+use App\Models\DisciplineTranslate;
 use App\Services\DisciplineService;
 use Illuminate\Http\Request;
 
@@ -26,6 +27,14 @@ class DisciplinesController extends Controller
        return response()->json($disciplines);
     }
 
+    public function activeDeactive(Request $request, $id){
+        $specialty = Disciplines::findOrFail($id);
+        $specialty->update([
+            'active' => $request->active
+        ]);
+        return response()->json(['msg' => 'Discipline updated Succesffully.']);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -46,18 +55,35 @@ class DisciplinesController extends Controller
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
             $discipline = new Disciplines();
-            $discipline->fill($request->all());
+            $discipline->active = 1;
 
-            if ($request->hasFile('image')) {
-                $ext = $request->image->extension();
-                $filename = rand(1, 100).time().'.'.$ext;
+            if(!isset($request->discipline_id)){
+               $discipline->user_id = auth()->user()->id;
+               if ($request->hasFile('image')) {
+                    $ext = $request->image->extension();
+                    $filename = rand(1, 100).time().'.'.$ext;
 
-                $request->image->storeAs('public/uploads',$filename);
-                $discipline->image = $filename;
+                    $request->image->storeAs('public/uploads',$filename);
+                    $discipline->image = $filename;
 
+                }
+                $discipline->save();
             }
-            $discipline->save();
 
+
+
+
+            $discipline_translate = new DisciplineTranslate();
+
+            if(isset($request->discipline_id)){
+                $discipline_translate->discipline_id = $request->discipline_id;
+            }else{
+                $discipline_translate->discipline_id = $discipline->id;
+            }
+
+            $discipline_translate->fill($request->all());
+            $discipline_translate->user_id = auth()->user()->id;
+            $discipline_translate->save();
             return response()->json(['msg' => 'Discipline Added Succesffully.']);
        }
     }
@@ -68,9 +94,15 @@ class DisciplinesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return Disciplines::where('id', $id)->first();
+        $data = DisciplineTranslate::where('id', $id)->with('discipline')->first();
+
+
+        if(isset($request->add_lang)){
+           $data->languages = DisciplineTranslate::where('discipline_id', $request->discipline_id)->get();
+        }
+        return $data;
     }
 
     /**
@@ -94,19 +126,28 @@ class DisciplinesController extends Controller
     public function update(DisciplinesRequests $request, $id)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
-            $discipline = Disciplines::findOrFail($id);
-            $discipline->fill($request->all());
 
-            if ($request->hasFile('image')) {
-                $ext = $request->image->extension();
-                $filename = rand(1, 100).time().'.'.$ext;
+            $discipline_translate = DisciplineTranslate::findOrFail($id);
 
-                $request->image->storeAs('public/uploads',$filename);
-                $discipline->image = $filename;
+            $discipline = Disciplines::findOrFail($discipline_translate->discipline_id);
 
+            if($request->image != ''){
+                if ($request->hasFile('image')) {
+                    $ext = $request->image->extension();
+                    $filename = rand(1, 100).time().'.'.$ext;
+
+                    $request->image->storeAs('public/uploads',$filename);
+                    $discipline->image = $filename;
+
+                }
             }
+
             $discipline->save();
 
+            $discipline_translate->name = $request->name;
+            $discipline_translate->description = $request->description;
+            $discipline_translate->active = $request->active;
+            $discipline_translate->save();
             return response()->json(['msg' => 'Discipline Updated Successfully.']);
        }
     }
@@ -120,8 +161,18 @@ class DisciplinesController extends Controller
     public function destroy($id)
     {
         if(auth()->user()->role == 'super_admin'){
-            $discipline = Disciplines::findOrFail($id);
-            $discipline->delete();
+            $discipline_translate = DisciplineTranslate::findOrFail($id);
+            $discipline = Disciplines::findOrFail($discipline_translate->discipline_id);
+            $check = DisciplineTranslate::where('discipline_id', $discipline_translate->discipline_id)->get();
+
+            if(count($check) == 1){
+                $discipline->active ='0';
+                $discipline->save();
+                // return $check;
+            }
+
+            $discipline_translate->delete();
+
             return response()->json(['msg' => 'Discipline has been deleted successfully.']);
         }
     }

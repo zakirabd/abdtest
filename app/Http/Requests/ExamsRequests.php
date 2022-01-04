@@ -25,7 +25,6 @@ class ExamsRequests extends FormRequest
     {
         $validate = [
             'exam_type' => 'required',
-            'lang_id' => 'required',
             'active' => 'required',
         ];
         return $validate;

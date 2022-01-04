@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CitiesRequests;
 use App\Models\Cities;
+use App\Models\CitiesTranslate;
 use App\Services\CitiesService;
 use Illuminate\Http\Request;
 
@@ -16,7 +17,7 @@ class CitiesController extends Controller
      */
     public function index(Request $request)
     {
-        if(!$request->query('country_id') && $request->query('page') && $request->query('keyword')){
+        if(!$request->query('country_id') && $request->query('page')){
             $states = (new CitiesService($request))->getCities();
         }else if($request->query('country_id')){
             $states = (new CitiesService($request))->getCitiesByCountry();
@@ -28,6 +29,14 @@ class CitiesController extends Controller
 
         return response()->json($states);
 
+    }
+
+    public function activeDeactive(Request $request, $id){
+        $specialty = Cities::findOrFail($id);
+        $specialty->update([
+            'active' => $request->active
+        ]);
+        return response()->json(['msg' => 'City updated Succesffully.']);
     }
 
     /**
@@ -49,20 +58,39 @@ class CitiesController extends Controller
     public function store(CitiesRequests $request)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
-
             $city = new Cities();
-            $city->fill($request->all());
-            if ($request->hasFile('image_url')) {
-                $ext = $request->image_url->extension();
-                $filename = rand(1, 100).time().'.'.$ext;
 
-                $request->image_url->storeAs('public/uploads',$filename);
-                $city->image = $filename;
+            if(!isset($request->city_id)){
 
+                $city->active = 1;
+                $city->country_id = $request->country_id;
+                $city->state_id = $request->state_id;
+
+                if ($request->hasFile('image_url')) {
+                    $ext = $request->image_url->extension();
+                    $filename = rand(1, 100).time().'.'.$ext;
+
+                    $request->image_url->storeAs('public/uploads',$filename);
+                    $city->image = $filename;
+
+                }
+                $city->save();
             }
-            $city->save();
+
+
+            $city_translate = new CitiesTranslate();
+
+            $city_translate->fill($request->all());
+
+            if(!isset($request->city_id)){
+                $city_translate->city_id = $city->id;
+            }else{
+                $city_translate->city_id = $request->city_id;
+            }
+            $city_translate->save();
 
             return response()->json(['msg' => 'City Added Succesffully.']);
+
         }
     }
 
@@ -72,9 +100,16 @@ class CitiesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return Cities::where('id', $id)->first();
+        // return Cities::where('id', $id)->first();
+        $data = CitiesTranslate::where('id', $id)->with('city')->first();
+
+
+        if(isset($request->add_lang)){
+           $data->languages = CitiesTranslate::where('city_id', $request->city_id)->get();
+        }
+        return $data;
     }
 
     /**
@@ -98,11 +133,17 @@ class CitiesController extends Controller
     public function update(CitiesRequests $request, $id)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
-            $city = Cities::findOrFail($id);
-            $city->fill($request->all());
-            if($request->state_id == 0){
-                $city->state_id = null;
+
+            $cities_translate = CitiesTranslate::findOrFail($id);
+            $city = Cities::findOrFail($cities_translate->city_id);
+            if(isset($request->country_id)){
+               $city->country_id = $request->country_id;
             }
+            if(isset($request->state_id)){
+                $city->state_id = $request->state_id;
+            }
+            // $city->fill($request->all());
+
             if ($request->hasFile('image_url')) {
                 $ext = $request->image_url->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
@@ -112,8 +153,12 @@ class CitiesController extends Controller
 
             }
             $city->save();
+            $cities_translate->name = $request->name;
+            $cities_translate->description = $request->description;
+            $cities_translate->active = $request->active;
+            $cities_translate->save();
+            return response()->json(['msg' => 'city Updated Successfully.']);
 
-            return response()->json(['msg' => 'City Updated Successfully.']);
        }
     }
 
@@ -126,8 +171,20 @@ class CitiesController extends Controller
     public function destroy($id)
     {
         if(auth()->user()->role == 'super_admin'){
-            $city = Cities::findOrFail($id);
-            $city->delete();
+
+
+            $city_translate = CitiesTranslate::findOrFail($id);
+            $city = Cities::findOrFail($city_translate->city_id);
+            $check = CitiesTranslate::where('city_id', $city_translate->city_id)->get();
+
+            if(count($check) == 1){
+                $city->active ='0';
+                $city->save();
+                // return $check;
+            }
+
+            $city_translate->delete();
+
             return response()->json(['msg' => 'City has been deleted successfully.']);
         }
     }

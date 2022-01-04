@@ -11,34 +11,34 @@ class Countries extends Model
     protected $table = 'countries';
 
     protected $fillable = [
-        'name',
-        'description',
-        'image_url',
+        'image',
         'active',
-        'lang_id',
-        'user_id'
     ];
 
     protected $hidden = [
-        'user_id',
-        'image_url'
+        'image'
     ];
     protected $appends = ['image_full_url'];
 
 
     public function getImageFullUrlAttribute()
     {
-        if ($this->image_url) {
-            return asset("/storage/uploads/{$this->image_url}");
+        if ($this->image) {
+            return asset("/storage/uploads/{$this->image}");
         } else {
             return null;
         }
     }
 
-    public function user(){
-        return $this->belongsTo('App\Models\User');
-    }
     public function states(){
         return $this->hasOne('App\Models\States');
+    }
+
+    public function translate(){
+        return $this->hasOne('App\Models\CountriesTranslate');
+    }
+
+    public function manyTranslate(){
+        return $this->hasMany(CountriesTranslate::class, 'countries_id', 'id');
     }
 }

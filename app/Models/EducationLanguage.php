@@ -12,8 +12,6 @@ class EducationLanguage extends Model
     protected $table = 'education_language';
 
     protected $fillable = [
-        'language',
-        'lang_id',
         'active',
     ];
 

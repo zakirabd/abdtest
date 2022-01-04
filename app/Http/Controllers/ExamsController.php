@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ExamsRequests;
 use App\Models\Exams;
+use App\Models\ExamSubsections;
 use Illuminate\Http\Request;
 
 class ExamsController extends Controller
@@ -43,6 +44,7 @@ class ExamsController extends Controller
 
             $exam->save();
 
+            $exam->subsection()->attach(explode(',', $request->subsections));
             return response()->json(['msg' => 'Exams Added Succesffully.']);
         }
     }
@@ -79,11 +81,23 @@ class ExamsController extends Controller
     public function update(ExamsRequests $request, $id)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
+
             $exam = Exams::findOrFail($id);
+
             $exam->fill($request->all());
+
+            // $exam->type = $request->type;
+
             $exam->save();
 
-            return response()->json(['msg' => 'Exams Updated Successfully.']);
+            if(isset($request->subsections)){
+
+                $exam->subsection()->sync(explode(',', $request->subsections));
+
+            }
+
+             return response()->json(['msg' => 'Exams Updated Successfully.']);
+            // return $request->type;
        }
     }
 

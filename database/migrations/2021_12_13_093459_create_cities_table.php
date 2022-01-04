@@ -15,17 +15,17 @@ class CreateCitiesTable extends Migration
     {
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description');
+
             $table->string('image');
-            $table->string('active')->default('1');
+
+            $table->string('active')->default('0');
+
             $table->unsignedBigInteger('country_id');
             $table->foreign('country_id')->on('countries')->references('id');
+
             $table->unsignedBigInteger('state_id')->nullable();
             $table->foreign('state_id')->on('states')->references('id');
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->foreign('user_id')->on('users')->references('id');
-            $table->string('lang_id');
+
             $table->timestamps();
         });
     }

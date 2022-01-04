@@ -24,12 +24,9 @@ class CountriesRequests extends FormRequest
     public function rules()
     {
         $validate = [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable',
-            'image_url' => 'nullable',
-            'active' => 'required',
-            'lang_id' => 'required',
-            'user_id' => 'required',
+
+            'image' => 'nullable',
+            'active' => 'required'
         ];
         return $validate;
     }

@@ -76,8 +76,6 @@ class Education extends Model
 
     }
     public function getStateAttribute(){
-
-
         if($this->state_id){
             $state = States::where('id', $this->state_id)->first();
             return $state;
@@ -86,5 +84,8 @@ class Education extends Model
         }
     }
 
+    public function specialty(){
+        return $this->hasOne('App\Models\UniSpecialties');
+    }
 
 }

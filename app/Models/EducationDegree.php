@@ -11,13 +11,25 @@ class EducationDegree extends Model
     protected $table = 'education_degree';
 
     protected $fillable = [
-        'education_type',
-        'user_id',
-        'lang_id',
+
         'active',
+        'image'
     ];
 
+    protected $hidden = [
 
+        'image'
+    ];
+    protected $appends = ['image_full_url'];
+
+    public function getImageFullUrlAttribute()
+    {
+        if ($this->image) {
+            return asset("/storage/uploads/{$this->image}");
+        } else {
+            return null;
+        }
+    }
     public function user(){
         return $this->belongsTo('App\Models\User');
     }

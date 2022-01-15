@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class loginController extends Controller
@@ -46,5 +47,10 @@ class loginController extends Controller
                 return response()->json('Something went wrong on the server.', $e->getCode());
             }
         }
+     }
+
+     public  function logOut(Request $request){
+       $request->user()->currentAccessToken()->delete();
+       return response()->json(['msg' => 'Logged out successfully']);
      }
 }

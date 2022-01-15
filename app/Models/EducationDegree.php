@@ -13,7 +13,8 @@ class EducationDegree extends Model
     protected $fillable = [
 
         'active',
-        'image'
+        'image',
+        'countries_id'
     ];
 
     protected $hidden = [

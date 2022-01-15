@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\EducationDegreeRequests;
+use App\Models\CountriesTranslate;
 use App\Models\EducationDegree;
 use App\Models\EducationDegreeTranslate;
 use Illuminate\Http\Request;
@@ -16,7 +17,25 @@ class EducationDegreeController extends Controller
      */
     public function index(Request $request)
     {
-        return EducationDegreeTranslate::where('lang_id', $request->lang_id? $request->lang_id:1)->with('education_degree')->orderBy('id', 'DESC')->get();
+        if(isset($request->country_id) && $request->country_id != ''){
+
+            $education_degree = EducationDegreeTranslate::where('lang_id', $request->lang_id? $request->lang_id:1)
+            ->with('education_degree')
+            ->whereHas('education_degree', function($q) use ($request){
+                $q->where('countries_id', $request->country_id);
+            })
+            ->orderBy('id', 'DESC')
+            ->get();
+            $education_degree->country_name = CountriesTranslate::where('countries_id',$request->country_id)->where('lang_id', $request->lang_id? $request->lang_id:1)->first()->name;
+
+        }else{
+            $education_degree = EducationDegreeTranslate::where('lang_id', $request->lang_id? $request->lang_id:1)->with('education_degree')->orderBy('id', 'DESC')->get();
+            foreach($education_degree as $item){
+                $item->country_name = CountriesTranslate::where('countries_id', $item->education_degree->countries_id)->where('lang_id', $request->lang_id? $request->lang_id:1)->first()->name;
+            }
+        }
+
+        return $education_degree;
     }
 
 
@@ -49,6 +68,11 @@ class EducationDegreeController extends Controller
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'){
             $education_degree = new EducationDegree();
             $education_degree->active = 1;
+            $education_degree_json = json_decode($request->education_degree_json, true);
+
+            if(isset($education_degree_json) && $education_degree_json != ""){
+                $education_degree->countries_id = $education_degree_json['countries_id'];
+            }
 
             if(!isset($request->education_degree_id)){
 
@@ -94,6 +118,7 @@ class EducationDegreeController extends Controller
     {
         $data = EducationDegreeTranslate::where('id', $id)->with('education_degree')->first();
 
+        $data->country_name = CountriesTranslate::where('countries_id', $data->education_degree->countries_id)->where('lang_id', $data->lang_id? $data->lang_id:1)->first()->name;
 
         if(isset($request->add_lang)){
            $data->languages = EducationDegreeTranslate::where('education_degree_id', $request->education_degree_id)->get();
@@ -125,6 +150,11 @@ class EducationDegreeController extends Controller
             $education_degree_translate = EducationDegreeTranslate::findOrFail($id);
 
             $education_degree = EducationDegree::findOrFail($education_degree_translate->education_degree_id);
+            $education_degree_json = json_decode($request->education_degree_json, true);
+
+            if(isset($education_degree_json) && $education_degree_json != ""){
+                $education_degree->countries_id = $education_degree_json['countries_id'];
+            }
 
             if($request->image != ''){
                 if ($request->hasFile('image')) {

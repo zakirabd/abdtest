@@ -13,9 +13,19 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-         return User::get();
+        if($request->query_type && $request->query_type == 'staff'){
+            $user = User::where('role_id', '!=', '1')->where('role_id', '!=', '4');
+
+            if($request->keyword != ''){
+                $user->where('first_name', 'like', "%{$request->keyword}%")
+                ->orWhere('last_name', 'like', "%{$request->keyword}%")
+                ->orWhere('email', 'like', "%{$request->keyword}%");
+            }
+            return $user->orderBy('id', 'DESC')->get();
+        }
+
         //  return auth()->user();
     }
 
@@ -23,6 +33,16 @@ class UserController extends Controller
     {
          return auth()->user();
         //  return auth()->user();
+    }
+
+
+
+    public function activeDeactive(Request $request, $id){
+        $specialty = User::findOrFail($id);
+        $specialty->update([
+            'lock_status' => $request->active
+        ]);
+        return response()->json(['msg' => 'User updated Succesffully.']);
     }
 
     /**
@@ -44,7 +64,7 @@ class UserController extends Controller
     public function store(UserRequests $request)
     {
         $user = new User();
-        // $user->fill($request->all());
+
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
@@ -67,7 +87,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        return User::findOrFail($id);
     }
 
     /**
@@ -90,7 +110,24 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user = User::findOrFail($id);
+
+        $user->fill($request->all());
+        if($user->password != ''){
+
+            $user->password = bcrypt($request->password);
+
+        }
+
+        if ($request->hasFile('image')) {
+            $ext = $request->image->extension();
+            $filename = rand(1, 100).time().'.'.$ext;
+
+            $request->image->storeAs('public/uploads',$filename);
+            $user->image = $filename;
+        }
+        $user->save();
+        return response()->json(['msg' => 'User Updated Successfully']);
     }
 
     /**

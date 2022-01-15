@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CountriesTranslate;
+use App\Models\EducationDegreeTranslate;
 use App\Models\GradingScheme;
 use Illuminate\Http\Request;
 
@@ -12,9 +14,15 @@ class GradingSchemeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return GradingScheme::orderBy('id', 'DESC')->get();
+
+        $grading_scheme = GradingScheme::orderBy('id', 'DESC')->get();
+        foreach($grading_scheme as $item){
+            $item->country_name = CountriesTranslate::where('countries_id', $item->countries_id)->where('lang_id', $request->lang_id)->first()->name;
+            $item->education_degree = EducationDegreeTranslate::where('education_degree_id', $item->education_degree_id)->where('lang_id', $request->lang_id)->first()->education_type;
+        }
+        return $grading_scheme;
     }
 
     /**
@@ -51,9 +59,14 @@ class GradingSchemeController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        return GradingScheme::where('id', $id)->first();
+
+        $grading_scheme = GradingScheme::where('id', $id)->first();
+        $grading_scheme->country_name = CountriesTranslate::where('countries_id', $grading_scheme->countries_id)->where('lang_id', $request->lang_id)->first()->name;
+        $grading_scheme->education_degree = EducationDegreeTranslate::where('education_degree_id', $grading_scheme->education_degree_id)->where('lang_id', $request->lang_id)->first()->education_type;
+
+        return $grading_scheme;
     }
 
     /**

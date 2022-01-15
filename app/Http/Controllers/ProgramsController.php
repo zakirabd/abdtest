@@ -98,6 +98,11 @@ class ProgramsController extends Controller
                 $program->application_fee = $program_json['application_fee'];
                 $program->fee_type = $program_json['fee_type'];
                 $program->schoolarship_type = $program_json['schoolarship_type'];
+
+                $program->ib_diploma = $program_json['ib_diploma'];
+                $program->a_level = $program_json['a_level'];
+                $program->advanced_placement = $program_json['advanced_placement'];
+                $program->ossd = $program_json['ossd'];
                 $program->user_id = auth()->user()->id;
             }
 
@@ -179,7 +184,15 @@ class ProgramsController extends Controller
                 }
             }
 
-            return response()->json(['msg' => 'Program Added Succesffully.', 'data' =>  $program_translate->where('id',  $program_translate->id)->with('program')->first()]);
+            $updated_program = $program_translate->where('id',  $program_translate->id)->with('program')->first();
+
+            $updated_program->program->specialty_exams = ProgramExams::where('program_id', $updated_program->program_id)->with('exam')->get();
+
+            foreach($updated_program->program->specialty_exams as $exam){
+                $exam->sub_sections = ProgramExamsSubSections::where('exam_id', $exam->exam_id)->where('program_id', $updated_program->program_id)->get();
+            }
+
+            return response()->json(['msg' => 'Program Added Succesffully.', 'data' =>  $updated_program]);
 
             // return $request;
         }
@@ -196,6 +209,11 @@ class ProgramsController extends Controller
     {
         $data = ProgramsTranslate::where('id', $id)->with('program')->first();
 
+        $data->program->specialty_exams = ProgramExams::where('program_id', $data->program_id)->with('exam')->get();
+
+        foreach($data->program->specialty_exams as $exam){
+            $exam->sub_sections = ProgramExamsSubSections::where('exam_id', $exam->exam_id)->where('program_id', $data->program_id)->get();
+        }
 
         if(isset($request->add_lang)){
            $data->languages = ProgramsTranslate::where('program_id', $request->program_id)->get();
@@ -203,6 +221,9 @@ class ProgramsController extends Controller
         return $data;
     }
 
+    public function getProgramData(Request $request){
+        return ProgramsTranslate::where('program_id', $request->program_id)->where('lang_id', $request->lang_id)->with('program')->first();
+    }
     /**
      * Show the form for editing the specified resource.
      *
@@ -224,7 +245,7 @@ class ProgramsController extends Controller
     public function update(Request $request, $id)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'
-        || auth()->user()->role == 'unirep'){
+        || auth()->user()->role == 'uni_rep'){
 
             $program_translate = ProgramsTranslate::findOrFail($id);
             $program = Programs::findOrFail($request->program_id);
@@ -257,6 +278,11 @@ class ProgramsController extends Controller
                 $program->application_fee = $program_json['application_fee'];
                 $program->fee_type = $program_json['fee_type'];
                 $program->schoolarship_type = $program_json['schoolarship_type'];
+
+                $program->ib_diploma = $program_json['ib_diploma'];
+                $program->a_level = $program_json['a_level'];
+                $program->advanced_placement = $program_json['advanced_placement'];
+                $program->ossd = $program_json['ossd'];
                 // schoolarship_type
                 $program->user_id = auth()->user()->id;
 
@@ -333,7 +359,16 @@ class ProgramsController extends Controller
                     }
                 }
             }
-            return response()->json(['msg' => 'Program Update Successfully.', 'data'=>$program_translate->where('id',  $program_translate->id)->with('program')->first()]);
+
+            $updated_program = $program_translate->where('id',  $program_translate->id)->with('program')->first();
+
+            $updated_program->program->specialty_exams = ProgramExams::where('program_id', $updated_program->program_id)->with('exam')->get();
+
+            foreach($updated_program->program->specialty_exams as $exam){
+                $exam->sub_sections = ProgramExamsSubSections::where('exam_id', $exam->exam_id)->where('program_id', $updated_program->program_id)->get();
+            }
+            return response()->json(['msg' => 'Program Update Successfully.', 'data'=>$updated_program]);
+
         }
     }
 

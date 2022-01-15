@@ -22,6 +22,6 @@ class ProgramsTranslate extends Model
     ];
 
     public function program(){
-        return $this->belongsTo('App\Models\Programs');
+        return $this->belongsTo('App\Models\Programs')->with('discipline')->with('education_degree');
     }
 }

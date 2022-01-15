@@ -39,7 +39,12 @@ class CountriesController extends Controller
         ]);
         return response()->json(['msg' => 'Countries updated Succesffully.']);
     }
+    // get one country data
 
+    public function getCountryData(Request $request){
+        $country = CountriesTranslate::where('countries_id', $request->country_id)->where('lang_id', $request->lang_id)->with('countries')->first();
+        return $country;
+    }
     /**
      * Show the form for creating a new resource.
      *

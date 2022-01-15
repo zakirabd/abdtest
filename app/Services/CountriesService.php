@@ -32,6 +32,7 @@ class CountriesService
         }
 
 
+
         return $this->countries->where('lang_id', $this->request->lang_id)->with('countries')->orderBy('id', 'DESC')->take($this->request->page * 20)->get();
 
     }

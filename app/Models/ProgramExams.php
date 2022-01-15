@@ -17,14 +17,14 @@ class ProgramExams extends Model
         'overall',
         'active'
     ];
-    protected $appends = ['sub_sections'];
+    // protected $appends = ['sub_sections'];
 
     public function exam(){
         return $this->belongsTo("App\Models\Exams");
     }
 
 
-    public function getSubSectionsAttribute(){
-        return ProgramExamsSubSections::where('exam_id', $this->exam_id)->get();
-    }
+    // public function getSubSectionsAttribute(){
+    //     return ProgramExamsSubSections::where('exam_id', $this->exam_id)->get();
+    // }
 }

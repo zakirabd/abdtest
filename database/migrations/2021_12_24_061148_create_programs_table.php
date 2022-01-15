@@ -56,6 +56,14 @@ class CreateProgramsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->on('users')->references('id');
 
+            $table->string('ib_diploma')->nullable();
+
+            $table->string('a_level')->nullable();
+
+            $table->string('advanced_placement')->nullable();
+
+            $table->string('ossd')->nullable();
+
             $table->timestamps();
         });
     }

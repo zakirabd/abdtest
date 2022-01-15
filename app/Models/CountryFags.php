@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ProgramDiscipline extends Model
+class CountryFags extends Model
 {
     use HasFactory;
 
-    protected $table = 'program_discipline';
+    protected $table = 'country_fags';
 
     protected $fillable = [
-        'programs_id',
-        'discipline_id',
-
+        'id',
+        'countries_id',
+        'type',
+        'active',
     ];
 }

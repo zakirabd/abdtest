@@ -57,8 +57,13 @@ class User extends Authenticatable
     }
     public function getImageFullUrlAttribute()
     {
-        return null;
+        if ($this->image) {
+            return asset("/storage/uploads/{$this->image}");
+        } else {
+            return null;
+        }
     }
+
     public function getRoleAttribute()
     {
         $role = Roles::where('id', $this->role_id)->select('name')->first();

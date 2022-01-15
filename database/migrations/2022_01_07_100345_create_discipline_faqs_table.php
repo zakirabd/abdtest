@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProgramDisciplineTable extends Migration
+class CreateDisciplineFaqsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateProgramDisciplineTable extends Migration
      */
     public function up()
     {
-        Schema::create('program_discipline', function (Blueprint $table) {
+        Schema::create('discipline_faqs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('programs_id');
-            $table->foreign('programs_id')->on('programs')->references('id');
-
             $table->unsignedBigInteger('discipline_id');
             $table->foreign('discipline_id')->on('disciplines')->references('id');
+            $table->string('active');
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateProgramDisciplineTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('program_discipline');
+        Schema::dropIfExists('discipline_faqs');
     }
 }

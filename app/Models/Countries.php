@@ -18,7 +18,7 @@ class Countries extends Model
     protected $hidden = [
         'image'
     ];
-    protected $appends = ['image_full_url'];
+    protected $appends = ['image_full_url', 'institution_count', 'city_count'];
 
 
     public function getImageFullUrlAttribute()
@@ -40,5 +40,15 @@ class Countries extends Model
 
     public function manyTranslate(){
         return $this->hasMany(CountriesTranslate::class, 'countries_id', 'id');
+    }
+
+    public function getInstitutionCountAttribute(){
+        $institutions =  Institutions::where('country_id', $this->id)->get();
+        return count($institutions);
+    }
+
+    public function getCityCountAttribute(){
+        $cities = Cities::where('country_id', $this->id)->get();
+        return count($cities);
     }
 }

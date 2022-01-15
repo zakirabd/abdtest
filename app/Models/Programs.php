@@ -34,20 +34,26 @@ class Programs extends Model
 
     ];
 
-    protected $appends = ['specialty_exams', 'discipline'];
+    // protected $appends = ['specialty_exams'];
 
     public function program_discipline(){
-        return $this->belongsToMany("App\Models\Programs", "program_discipline", "program_id", "discipline_id");
+        return $this->belongsToMany("App\Models\Programs", "program_discipline", "programs_id", "discipline_id");
     }
 
+    // public function getDisciplineAttribute(){
+    //     return ProgramDiscipline::where('programs_id', $this->id)->get();
+    // }
 
-    public function getDisciplineAttribute(){
-        return ProgramDiscipline::where('program_id', $this->id)->get();
+    public function discipline(){
+        return $this->hasMany("App\Models\ProgramDiscipline");
     }
 
-    public function getSpecialtyExamsAttribute(){
-        return ProgramExams::where('program_id', $this->id)->with('exam')->get();
-    }
+    // public function getSpecialtyExamsAttribute(){
+    //     return ProgramExams::where('program_id', $this->id)->with('exam')->get();
+    // }
 
+    public function education_degree(){
+        return $this->belongsTo('App\Models\EducationDegree');
+    }
 
 }

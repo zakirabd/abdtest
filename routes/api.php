@@ -143,6 +143,7 @@ Route::prefix('v1')->group(function () {
     Route::get('public-programs', [ProgramsController::class, 'index']);
     Route::get('public-program-data', [ ProgramsController::class, 'getProgramData']);
 
+    Route::get('public-exams',[ExamsController::class, 'index']);
 
 });
 

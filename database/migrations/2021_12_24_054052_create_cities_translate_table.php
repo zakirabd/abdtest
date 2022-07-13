@@ -21,7 +21,7 @@ class CreateCitiesTranslateTable extends Migration
 
             $table->string('name');
 
-            $table->string('description');
+            $table->string('description', '1000');
 
             $table->string('lang_id');
 

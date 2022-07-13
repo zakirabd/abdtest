@@ -15,6 +15,7 @@ class CountryWiseEducation extends Model
         'residental_country_id',
         'residental_degree_id',
         'destination_country_id',
-        'destination_degree_id'
+        'destination_degree_id',
+        'residental_sub_degree_id'
     ];
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CountriesTranslate;
 use App\Models\EducationDegreeTranslate;
+use App\Models\CountryEducationDegreeTranslate;
 use App\Models\GradingScheme;
 use Illuminate\Http\Request;
 
@@ -16,13 +17,25 @@ class GradingSchemeController extends Controller
      */
     public function index(Request $request)
     {
-
-        $grading_scheme = GradingScheme::orderBy('id', 'DESC')->get();
-        foreach($grading_scheme as $item){
-            $item->country_name = CountriesTranslate::where('countries_id', $item->countries_id)->where('lang_id', $request->lang_id)->first()->name;
-            $item->education_degree = EducationDegreeTranslate::where('education_degree_id', $item->education_degree_id)->where('lang_id', $request->lang_id)->first()->education_type;
+        if(isset($request->type) && $request->type == 'education_degree' ){
+           
+            return $grading_scheme = GradingScheme::where('countries_id', $request->country_id)->where('education_degree_id', $request->education_degree_id)->get();
+        }else if(isset($request->type) && $request->type == 'education_sub_degree'){
+            return $grading_scheme = GradingScheme::where('countries_id', $request->country_id)->where('education_degree_id', $request->education_degree_id)->where('education_sub_degree_id', $request->education_sub_degree_id)->get();
+        }else{
+            $grading_scheme = GradingScheme::orderBy('id', 'DESC')->get();
+            foreach($grading_scheme as $item){
+                $item->country_name = CountriesTranslate::where('countries_id', $item->countries_id)->where('lang_id', $request->lang_id)->first()->name;
+                if(isset($item->education_sub_degree_id)){
+                    $item->education_degree = CountryEducationDegreeTranslate::where('country_education_degree_id', $item->education_sub_degree_id)->where('lang_id', $request->lang_id)->first()->name;
+                }else{
+                    $item->education_degree = EducationDegreeTranslate::where('education_degree_id', $item->education_degree_id)->where('lang_id', $request->lang_id)->first()->education_type;
+                }
+                
+            }
+            return $grading_scheme;
         }
-        return $grading_scheme;
+        
     }
 
     /**

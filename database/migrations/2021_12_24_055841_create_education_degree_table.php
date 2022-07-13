@@ -17,7 +17,6 @@ class CreateEducationDegreeTable extends Migration
             $table->id();
             $table->string('image');
             $table->string('active')->default('1');
-
             $table->timestamps();
         });
     }

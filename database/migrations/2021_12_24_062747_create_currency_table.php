@@ -19,7 +19,6 @@ class CreateCurrencyTable extends Migration
             $table->string('active')->default('1');
             $table->string('currency');
 
-            $table->string('active')->default('0');
             $table->timestamps();
         });
     }

@@ -21,15 +21,17 @@ class Institutions extends Model
         'international_ranking',
         'video_link',
         'state_id',
-        'country_id'
+        'country_id',
+        'background_image'
     ];
 
     protected $hidden = [
         'user_id',
         'logo',
-        'image'
+        'image',
+        'background_image'
     ];
-    protected $appends = ['image_full_url', 'logo_full_url'];
+    protected $appends = ['image_full_url', 'logo_full_url', 'background_full_url'];
 
 
     public function getImageFullUrlAttribute()
@@ -45,6 +47,15 @@ class Institutions extends Model
     {
         if ($this->logo) {
             return asset("/storage/uploads/{$this->logo}");
+        } else {
+            return null;
+        }
+    }
+
+    public function getBackgroundFullUrlAttribute()
+    {
+        if ($this->background_image) {
+            return asset("/storage/uploads/{$this->background_image}");
         } else {
             return null;
         }

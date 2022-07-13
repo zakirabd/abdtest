@@ -13,18 +13,29 @@ class Countries extends Model
     protected $fillable = [
         'image',
         'active',
+        'background_image'
     ];
 
     protected $hidden = [
-        'image'
+        'image',
+        'background_image'
     ];
-    protected $appends = ['image_full_url', 'institution_count', 'city_count'];
+    protected $appends = ['image_full_url', 'institution_count', 'city_count', 'background_full_url'];
 
 
     public function getImageFullUrlAttribute()
     {
         if ($this->image) {
             return asset("/storage/uploads/{$this->image}");
+        } else {
+            return null;
+        }
+    }
+
+    public function getBackgroundFullUrlAttribute()
+    {
+        if ($this->background_image) {
+            return asset("/storage/uploads/{$this->background_image}");
         } else {
             return null;
         }

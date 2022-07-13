@@ -25,9 +25,13 @@ use App\Http\Controllers\StateFaqsController;
 use App\Http\Controllers\StatesController;
 use App\Http\Controllers\UniSpecialtiesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CountryEducationDegreeController;
+use App\Http\Controllers\MatchingProgramController;
+use App\Http\Controllers\StudentAppliedProgramController;
 use App\Models\CountyFagsTranslate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\StudentRoleMainController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,18 +47,21 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    Route::resource('language', LanguageController::class);
-    Route::post('/login', [loginController::class, 'login']);
 
+
+    Route::post('/login', [loginController::class, 'login']);
+    Route::resource('role', RolesController::class);
     Route::group(['middleware'=> ['auth:sanctum']], function(){
 
+        Route::resource('language', LanguageController::class);
         Route::post('/logOut', [loginController::class, 'logOut']);
-
-
         Route::resource('users', UserController::class);
+        // Route::resource('role', RolesController::class);
+
+
         Route::put('users-active-deactive/{id}', [UserController::class, 'activeDeactive']);
 
-        Route::resource('role', RolesController::class);
+
 
 
 
@@ -86,6 +93,7 @@ Route::prefix('v1')->group(function () {
         Route::put('institutions-active-deactive/{id}', [InstitutionsController::class, 'activeDeactive']);
 
         Route::resource('educationDegree', EducationDegreeController::class);
+        Route::resource('country-education-degree', CountryEducationDegreeController::class);
 
 
 
@@ -112,6 +120,13 @@ Route::prefix('v1')->group(function () {
         Route::put('program-active-deactive/{id}', [ProgramsController::class, 'activeDeactive']);
 
         Route::resource('country-wise-education', CountryWiseEducationController::class);
+
+
+        Route::resource('student-main-data', StudentRoleMainController::class);
+        Route::resource('student-apply', StudentAppliedProgramController::class);
+        Route::post('student-wish-list', [StudentAppliedProgramController::class, 'studentWishListAdd']);
+        Route::get('get-student-wish-list', [StudentAppliedProgramController::class, 'getStudentWishList']);
+        // Route::put('student-program-update', [StudentAppliedProgramController::class, 'programUpdate']);
     });
     // Route::resource('countries', CountriesController::class);
 
@@ -144,6 +159,12 @@ Route::prefix('v1')->group(function () {
     Route::get('public-program-data', [ ProgramsController::class, 'getProgramData']);
 
     Route::get('public-exams',[ExamsController::class, 'index']);
+
+    Route::resource('match-program', MatchingProgramController::class);
+
+    Route::post('send-confirm-email', [UserController::class, 'sendConfirmationCode']);
+
+    Route::post('register-student', [UserController::class, 'store']);
 
 });
 

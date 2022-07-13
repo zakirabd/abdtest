@@ -6,6 +6,7 @@ use App\Models\CountriesTranslate;
 use App\Models\CountryWiseEducation;
 use App\Models\EducationDegreeTranslate;
 use Illuminate\Http\Request;
+use App\Models\CountryEducationDegreeTranslate;
 
 class CountryWiseEducationController extends Controller
 {
@@ -24,6 +25,12 @@ class CountryWiseEducationController extends Controller
 
             $item->destination_country = CountriesTranslate::where('countries_id', $item->destination_country_id)->where('lang_id', $request->lang_id ? $request->lang_id: '1')->first()->name;
             $item->destination_degree = EducationDegreeTranslate::where('education_degree_id', $item->destination_degree_id)->where('lang_id', $request->lang_id ? $request->lang_id: '1')->first()->education_type;
+            if(isset($item->residental_sub_degree_id)){
+                $item->residental_sub_degree = CountryEducationDegreeTranslate::where('country_education_degree_id', $item->residental_sub_degree_id)->where('lang_id', $request->lang_id ? $request->lang_id: '1')->first()->name;
+            }else{
+                 $item->residental_sub_degree = "";
+            }
+            
         }
 
         return $wise_education;
@@ -74,6 +81,12 @@ class CountryWiseEducationController extends Controller
 
         $wise_education->destination_country = CountriesTranslate::where('countries_id', $wise_education->destination_country_id)->where('lang_id', $wise_education->lang_id ? $wise_education->lang_id: '1')->first()->name;
         $wise_education->destination_degree = EducationDegreeTranslate::where('education_degree_id', $wise_education->destination_degree_id)->where('lang_id', $wise_education->lang_id ? $wise_education->lang_id: '1')->first()->education_type;
+        
+        if(isset($wise_education->residental_sub_degree_id)){
+            $wise_education->residental_sub_degree = CountryEducationDegreeTranslate::where('country_education_degree_id', $wise_education->residental_sub_degree_id)->where('lang_id', $wise_education->lang_id ? $wise_education->lang_id: '1')->first()->name;
+        }else{
+            $wise_education->residental_sub_degree = "";
+        }
 
         return $wise_education;
     }

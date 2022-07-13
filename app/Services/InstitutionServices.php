@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\CitiesTranslate;
 use App\Models\CountriesTranslate;
 use App\Models\InstitutionalTypeTranslate;
+use App\Models\InstitutionApprove;
 use App\Models\InstitutionsTranslate;
+use App\Models\InstitutionTranslateApprove;
 
 /**
  * Class InstitutionServices
@@ -19,7 +21,15 @@ class InstitutionServices
     public function __construct($request)
     {
         $this->request = $request;
-        $this->institutions = InstitutionsTranslate::with('institutions')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        if(auth()->user() && auth()->user()->role == 'uni_rep'){
+            $this->institutions = InstitutionsTranslate::with('institutions')->where('user_id', '1')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1)
+                                                        ->orWhere('user_id', auth()->user()->id)->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        }else if(auth()->user() && auth()->user()->role == 'super_admin') {
+            $this->institutions = InstitutionsTranslate::with('institutions')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        }else{
+            $this->institutions = InstitutionsTranslate::with('institutions')->where('active', '1')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        }
+
 
     }
 
@@ -75,7 +85,17 @@ class InstitutionServices
     }
 
     public function getOneInstitution(){
-        return  $this->institutions->where('institutions_id', $this->request->institution_id)->first();
+        return InstitutionsTranslate::with('institutions')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1)->where('institutions_id', $this->request->institution_id)->first();
+        // return $this->request->institution_id;
     }
 
+
+    // public function getInstitutionApprove(){
+    //     $institution_approve = InstitutionTranslateApprove::where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1)->get();
+    //     foreach($institution_approve as $item){
+    //         $item->institutions = InstitutionApprove::where('institutions_id', $item->institutions_id)->first();
+    //     }
+
+    //     return  $institution_approve;
+    // }
 }

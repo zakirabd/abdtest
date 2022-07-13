@@ -21,7 +21,7 @@ class CreateInstitutionsTranslateTable extends Migration
 
             $table->string("name");
 
-            $table->string("description");
+            $table->string("description", '1000');
 
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->on('users')->references('id');
@@ -29,6 +29,8 @@ class CreateInstitutionsTranslateTable extends Migration
             $table->string("lang_id");
 
             $table->string('active')->default('0');
+
+            $table->string('approve_status')->default('0');
 
             $table->timestamps();
         });

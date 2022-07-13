@@ -22,16 +22,18 @@ class UploadHelper
     {
         $filename = time() . $file->getClientOriginalName();
         $image = Image::make($file)->fit($width, $height);
-        Storage::put("public/images/{$directory}/{$filename}/", (string)$image->encode());
-        return "images/avatars/{$filename}";
+                Storage::disk('do')->put("/{$directory}/{$filename}/", (string)$image->encode(), 'public');
+
+        return "{$filename}";
     }
 
     public static function imageUploadOriginalSize($file, $directory): string
     {
         $filename = time() . $file->getClientOriginalName();
         $image = Image::make($file);
-        Storage::put("public/images/{$directory}/{$filename}/", (string)$image->encode());
-        return "images/avatars/{$filename}";
+               Storage::disk('do')->put("/{$directory}/{$filename}/", (string)$image->encode(), 'public');
+
+        return "{$filename}";
     }
         public static function file_upload($file = NULL, $dir = NULL,$width='270',$height='250')
         {

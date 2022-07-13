@@ -17,7 +17,7 @@ class CreateGradingSchemesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('countries_id');
             $table->foreign('countries_id')->on('countries')->references('id');
-
+            $table->string('education_sub_degree_id');
             $table->unsignedBigInteger('education_degree_id');
             $table->foreign('education_degree_id')->on('education_degree')->references('id');
             $table->string("min_value");

@@ -18,6 +18,7 @@ class CreateCountryFagsTable extends Migration
             $table->unsignedBigInteger('countries_id');
             $table->foreign('countries_id')->on('countries')->references('id');
             $table->string('active');
+            $table->string('type');
             $table->timestamps();
         });
     }

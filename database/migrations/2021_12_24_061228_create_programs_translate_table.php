@@ -21,7 +21,7 @@ class CreateProgramsTranslateTable extends Migration
 
             $table->string('name');
 
-            $table->string('description');
+            $table->string('description', '1000');
 
             $table->string('program_format');
 
@@ -29,6 +29,7 @@ class CreateProgramsTranslateTable extends Migration
             $table->foreign('user_id')->on('users')->references('id');
 
             $table->string('lang_id');
+            $table->string('active')->default('0');
 
             $table->timestamps();
         });

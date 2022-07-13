@@ -20,7 +20,7 @@ class CreateCountriesTranslateTable extends Migration
             $table->foreign('countries_id')->on('countries')->references('id');
 
             $table->string('name');
-            $table->string('description');
+            $table->string('description', '1000');
 
             $table->string('lang_id');
 

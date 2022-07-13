@@ -16,19 +16,30 @@ class Cities extends Model
         'active',
         'country_id',
         'state_id',
+        'background_image'
     ];
 
     protected $hidden = [
         'user_id',
-        'image'
+        'image',
+        'background_image'
     ];
-    protected $appends = ['image_full_url'];
+    protected $appends = ['image_full_url', 'background_full_url'];
 
 
     public function getImageFullUrlAttribute()
     {
         if ($this->image) {
             return asset("/storage/uploads/{$this->image}");
+        } else {
+            return null;
+        }
+    }
+
+    public function getBackgroundFullUrlAttribute()
+    {
+        if ($this->background_image) {
+            return asset("/storage/uploads/{$this->background_image}");
         } else {
             return null;
         }

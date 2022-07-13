@@ -7,6 +7,7 @@ use App\Models\Cities;
 use App\Models\CitiesTranslate;
 use App\Services\CitiesService;
 use Illuminate\Http\Request;
+use App\Helpers\UploadHelper;
 
 class CitiesController extends Controller
 {
@@ -67,11 +68,14 @@ class CitiesController extends Controller
                 $city->state_id = $request->state_id;
 
                 if ($request->hasFile('image_url')) {
+                   
+                    $city->image = UploadHelper::imageUpload($request->file('image_url'), 'uploads');
+
                     $ext = $request->image_url->extension();
                     $filename = rand(1, 100).time().'.'.$ext;
 
                     $request->image_url->storeAs('public/uploads',$filename);
-                    $city->image = $filename;
+                    $city->background_image = $filename;
 
                 }
                 $city->save();
@@ -145,11 +149,14 @@ class CitiesController extends Controller
             // $city->fill($request->all());
 
             if ($request->hasFile('image_url')) {
+               
+                $city->image = UploadHelper::imageUpload($request->file('image_url'), 'uploads');
+
                 $ext = $request->image_url->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->image_url->storeAs('public/uploads',$filename);
-                $city->image = $filename;
+                $city->background_image = $filename;
 
             }
             $city->save();

@@ -64,6 +64,16 @@ class CreateProgramsTable extends Migration
 
             $table->string('ossd')->nullable();
 
+            $table->string('application_fee')->nullable();
+
+            $table->string('fee_type')->nullable();
+
+            $table->string('schoolarship_type')->nullable();
+
+            $table->string('local_exam')->default('0');
+
+            $table->string('required_education_level')->nullable();
+
             $table->timestamps();
         });
     }

@@ -9,6 +9,8 @@ use App\Models\InstitutionsTranslate;
 use App\Models\ProgramExams;
 use App\Models\ProgramExamsSubSections;
 use App\Models\ProgramsTranslate;
+use App\Models\StudentsPrograms;
+
 
 /**
  * Class ProgramService
@@ -19,10 +21,19 @@ class ProgramService
     private $program;
     private $request;
 
+
     public function __construct($request)
     {
         $this->request = $request;
-        $this->program = ProgramsTranslate::with('program')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        if(auth()->user() && auth()->user()->role == 'uni_rep'){
+           $this->program = ProgramsTranslate::with('program')->where('user_id', auth()->user()->id)->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1)
+                                                              ->where('user_id','1')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        }else if(auth()->user() && auth()->user()->role == 'super_admin'){
+            $this->program = ProgramsTranslate::with('program')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        }else {
+            $this->program = ProgramsTranslate::with('program')->where('active', '1')->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1);
+        }
+
 
     }
 
@@ -93,6 +104,15 @@ class ProgramService
         $final_data = [];
 
         foreach($programs as $item){
+            if(auth()->user() != null && auth()->user()->role == 'student'){
+                $student_programs = StudentsPrograms::where('user_id', auth()->user()->id)->where('programs_id', $item->program_id)->first();
+                if(isset($student_programs)){
+                    $item->eligible = '1';
+                }else{
+                    $item->eligible = '0';
+                }
+            }
+
             $item->education_degree = EducationDegreeTranslate::where('education_degree_id', $item->program->education_degree_id)->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1)->first()->education_type;
             $item->education_language = EducationLanguageTranslate::where('education_language_id', $item->program->education_language_id)->where('lang_id', $this->request->lang_id ? $this->request->lang_id : 1)->first()->language;
             $item->currency = Currencies::where('id', $item->program->fee_currency_id)->first()->currency;

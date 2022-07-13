@@ -7,6 +7,7 @@ use App\Models\Disciplines;
 use App\Models\DisciplineTranslate;
 use App\Services\DisciplineService;
 use Illuminate\Http\Request;
+use App\Helpers\UploadHelper;
 
 class DisciplinesController extends Controller
 {
@@ -60,11 +61,8 @@ class DisciplinesController extends Controller
             if(!isset($request->discipline_id)){
                $discipline->user_id = auth()->user()->id;
                if ($request->hasFile('image')) {
-                    $ext = $request->image->extension();
-                    $filename = rand(1, 100).time().'.'.$ext;
-
-                    $request->image->storeAs('public/uploads',$filename);
-                    $discipline->image = $filename;
+                    
+                    $discipline->image = UploadHelper::imageUpload($request->file('image'), 'uploads');
 
                 }
                 $discipline->save();
@@ -133,11 +131,8 @@ class DisciplinesController extends Controller
 
             if($request->image != ''){
                 if ($request->hasFile('image')) {
-                    $ext = $request->image->extension();
-                    $filename = rand(1, 100).time().'.'.$ext;
-
-                    $request->image->storeAs('public/uploads',$filename);
-                    $discipline->image = $filename;
+                   
+                    $discipline->image = UploadHelper::imageUpload($request->file('image'), 'uploads');
 
                 }
             }

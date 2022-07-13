@@ -8,6 +8,7 @@ use App\Models\StatesTranslate;
 use App\Services\StatesService;
 use Illuminate\Http\Request;
 use NunoMaduro\Collision\Adapters\Phpunit\State;
+use App\Helpers\UploadHelper;
 
 class StatesController extends Controller
 {
@@ -65,11 +66,14 @@ class StatesController extends Controller
 
 
                 if ($request->hasFile('image_url')) {
+                   
+                    $state->image = UploadHelper::imageUpload($request->file('image_url'), 'uploads');
+
                     $ext = $request->image_url->extension();
                     $filename = rand(1, 100).time().'.'.$ext;
 
                     $request->image_url->storeAs('public/uploads',$filename);
-                    $state->image = $filename;
+                    $state->background_image = $filename;
 
                 }
                 $state->save();
@@ -141,11 +145,14 @@ class StatesController extends Controller
             // $state->fill($request->all());
 
             if ($request->hasFile('image_url')) {
+                
+                $state->image = UploadHelper::imageUpload($request->file('image_url'), 'uploads');
+
                 $ext = $request->image_url->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->image_url->storeAs('public/uploads',$filename);
-                $state->image = $filename;
+                $state->background_image = $filename;
 
             }
             $state->save();

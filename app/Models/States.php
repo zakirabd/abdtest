@@ -15,12 +15,14 @@ class States extends Model
         'image',
         'active',
         'countries_id',
+        'background_image'
     ];
 
     protected $hidden = [
-        'image'
+        'image',
+        'background_image'
     ];
-    protected $appends = ['image_full_url'];
+    protected $appends = ['image_full_url', 'background_full_url'];
 
 
     public function getImageFullUrlAttribute()
@@ -31,7 +33,15 @@ class States extends Model
             return null;
         }
     }
-
+    
+    public function getBackgroundFullUrlAttribute()
+    {
+        if ($this->background_image) {
+            return asset("/storage/uploads/{$this->background_image}");
+        } else {
+            return null;
+        }
+    }
 
 
     public function country(){

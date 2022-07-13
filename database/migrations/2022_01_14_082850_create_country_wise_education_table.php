@@ -18,6 +18,7 @@ class CreateCountryWiseEducationTable extends Migration
 
             $table->string('residental_country_id');
             $table->string('residental_degree_id');
+            $table->string('residental_sub_degree_id');
             $table->string('destination_country_id');
             $table->string('destination_degree_id');
 

@@ -27,6 +27,8 @@ class CreateInstitutionsTable extends Migration
 
             $table->string("logo")->nullable();
 
+            $table->string("background_image")->nullable();
+
             $table->string("image")->nullable();
 
             $table->string("video_link")->nullable();

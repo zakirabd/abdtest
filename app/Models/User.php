@@ -92,4 +92,13 @@ class User extends Authenticatable
     public function specialies(){
         return $this->hasOne('App\Models\Specialties');
     }
+
+    public function students_programs(){
+        return $this->belongsToMany("App\Models\User", "students_programs", "user_id", "programs_id");
+    }
+
+    public function programs(){
+        return $this->hasMany('App\Models\StudentsPrograms');
+    }
+
 }

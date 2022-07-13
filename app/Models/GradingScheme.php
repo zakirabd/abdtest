@@ -15,6 +15,7 @@ class GradingScheme extends Model
         'id',
         'countries_id',
         'education_degree_id',
+        'education_sub_degree_id',
         'min_value',
         'max_value'
     ];

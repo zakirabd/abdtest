@@ -31,7 +31,8 @@ class Programs extends Model
         'education_language_id',
         'application_fee',
         'fee_type',
-
+        'local_exam',
+        'required_education_level'
     ];
 
     // protected $appends = ['specialty_exams'];
@@ -55,5 +56,7 @@ class Programs extends Model
     public function education_degree(){
         return $this->belongsTo('App\Models\EducationDegree');
     }
+
+
 
 }

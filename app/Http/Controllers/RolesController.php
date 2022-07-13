@@ -52,7 +52,9 @@ class RolesController extends Controller
      */
     public function show($id)
     {
-        //
+        $role =  Roles::findOrFail($id);
+        return $role;
+
     }
 
     /**
@@ -75,7 +77,11 @@ class RolesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $role =  Roles::findOrFail($id);
+
+        $role->name = $request->name;
+        $role->save();
+        return response()->json(['msg' => 'Role updated successfully']);
     }
 
     /**
@@ -86,6 +92,10 @@ class RolesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $role =  Roles::findOrFail($id);
+
+       
+        $role->deleted();
+        return response()->json(['msg' => 'Role deleted successfully']);
     }
 }

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Helpers\UploadHelper;
 use App\Models\CountriesTranslate;
 
+
 class CountriesController extends Controller
 {
     /**
@@ -68,12 +69,14 @@ class CountriesController extends Controller
                 $country = new Countries();
 
                 if ($request->hasFile('image_url')) {
+                   
+                    $country->image = UploadHelper::imageUpload($request->file('image_url'), 'uploads');
+                        
                     $ext = $request->image_url->extension();
                     $filename = rand(1, 100).time().'.'.$ext;
 
                     $request->image_url->storeAs('public/uploads',$filename);
-                    $country->image = $filename;
-
+                    $country->background_image = $filename;
                 }
 
                 $country->active = '1';
@@ -152,11 +155,14 @@ class CountriesController extends Controller
 
 
             if ($request->hasFile('image_url')) {
+                
+                $country->image = UploadHelper::imageUpload($request->file('image_url'), 'uploads');
+
                 $ext = $request->image_url->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->image_url->storeAs('public/uploads',$filename);
-                $country->image = $filename;
+                $country->background_image = $filename;
 
             }
             $country->save();

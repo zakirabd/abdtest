@@ -6,6 +6,9 @@ use App\Models\Institutions;
 use App\Models\InstitutionsTranslate;
 use App\Services\InstitutionServices;
 use Illuminate\Http\Request;
+use App\Helpers\UploadHelper;
+use App\Models\InstitutionApprove;
+use App\Models\InstitutionTranslateApprove;
 
 class InstitutionsController extends Controller
 {
@@ -30,7 +33,12 @@ class InstitutionsController extends Controller
 
         }else if($request->query('query_type') && $request->query('query_type') == 'one'){
             $institutions = (new InstitutionServices($request))->getOneInstitution();
-        }else{
+        }
+        // else if($request->query('query_type') && $request->query('query_type') == 'approve'){
+        //     // getInstitutionApprove
+        //     $institutions = (new InstitutionServices($request))->getInstitutionApprove();
+        // }
+        else{
             $institutions = (new InstitutionServices($request))->getInstitutions();
         }
 
@@ -65,7 +73,7 @@ class InstitutionsController extends Controller
     public function store(Request $request)
     {
         if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'
-        || auth()->user()->role == 'unirep'){
+        || auth()->user()->role == 'uni_rep'){
 
             if(isset($request->institutions_id)){
                 $institutions = Institutions::findOrFail($request->institutions_id);
@@ -85,23 +93,30 @@ class InstitutionsController extends Controller
                 $institutions->country_id = $institutions_json['country_id'];
                 $institutions->state_id = $institutions_json['state_id'];
                 $institutions->active = $institutions_json['active'];
+                $institutions->video_link = $institutions_json['video_link'];
                 $institutions->user_id = auth()->user()->id;
             }
             if ($request->hasFile('image')) {
+
+                $institutions->image = UploadHelper::imageUpload($request->file('image'), 'uploads');
+
                 $ext = $request->image->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->image->storeAs('public/uploads',$filename);
-                $institutions->image = $filename;
+                $institutions->background_image = $filename;
 
             }
 
             if ($request->hasFile('logo')) {
+
+                $institutions->logo = UploadHelper::imageUpload($request->file('logo'), 'uploads');
+
                 $ext = $request->logo->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->logo->storeAs('public/uploads',$filename);
-                $institutions->logo = $filename;
+                $institutions->background_image = $filename;
 
             }
 
@@ -115,7 +130,7 @@ class InstitutionsController extends Controller
 
 
             $institutions_translate->institutions_id = $institutions->id;
-            $institutions_translate->video_link = $request->video_link;
+            // $institutions_translate->video_link = $request->video_link;
             $institutions_translate->save();
 
             return response()->json(['msg' => 'Institutions Added Succesffully.']);
@@ -160,8 +175,7 @@ class InstitutionsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager'
-        || auth()->user()->role == 'unirep'){
+        if(auth()->user()->role == 'super_admin' || auth()->user()->role == 'manager' ){
 
             $institutions_translate = InstitutionsTranslate::findOrFail($id);
             $institutions = Institutions::findOrFail($request->institutions_id);
@@ -177,32 +191,99 @@ class InstitutionsController extends Controller
                 $institutions->country_id = $institutions_json['country_id'];
                 $institutions->state_id = $institutions_json['state_id'];
                 $institutions->active = $institutions_json['active'];
+                $institutions->video_link = $institutions_json['video_link'];
             }
             if ($request->hasFile('image')) {
+
+                $institutions->image = UploadHelper::imageUpload($request->file('image'), 'uploads');
                 $ext = $request->image->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->image->storeAs('public/uploads',$filename);
-                $institutions->image = $filename;
+                $institutions->background_image = $filename;
 
             }
 
             if ($request->hasFile('logo')) {
+
+                $institutions->logo = UploadHelper::imageUpload($request->file('logo'), 'uploads');
                 $ext = $request->logo->extension();
                 $filename = rand(1, 100).time().'.'.$ext;
 
                 $request->logo->storeAs('public/uploads',$filename);
-                $institutions->logo = $filename;
+                // $institutions->background_image = $filename;
 
             }
 
             $institutions->save();
             $institutions_translate->fill($request->all());
-            $institutions_translate->video_link = $request->video_link;
+            // $institutions_translate->video_link = $request->video_link;
             $institutions_translate->save();
 
             return response()->json(['msg' => 'Institution Update Successfully.']);
 
+        }else if(auth()->user()->role == 'uni_rep'){
+            $institutions_translate = InstitutionsTranslate::findOrFail($id);
+            $institutions = Institutions::findOrFail($request->institutions_id);
+
+
+            $institution_translate_approve_check = InstitutionTranslateApprove::where('institutions_translate_id', $id)->first();
+            if(isset($institution_translate_approve_check)){
+                $institution_translate_approve = $institution_translate_approve_check;
+                $institution_approve = InstitutionApprove::where('institutions_id', $institution_translate_approve_check->institutions_id)->first();
+            }else {
+                $institution_translate_approve = new InstitutionTranslateApprove();
+                $institution_approve = new InstitutionApprove();
+            }
+
+            $institutions_json = json_decode($request->institutions_json, true);
+
+            if($institutions_json != ''){
+                $institution_approve->type = $institutions_json['type'];
+                $institution_approve->national_ranking = $institutions_json['national_ranking'];
+                $institution_approve->international_ranking = $institutions_json['international_ranking'];
+                $institution_approve->city_id = $institutions_json['city_id'];
+                $institution_approve->country_id = $institutions_json['country_id'];
+                $institution_approve->state_id = $institutions_json['state_id'];
+                $institution_approve->video_link = $institutions_json['video_link'];
+                $institution_approve->institutions_id = $request->institutions_id;
+                $institution_approve->user_id = auth()->user()->id;
+            }
+            if ($request->hasFile('image')) {
+
+                $institution_approve->image = UploadHelper::imageUpload($request->file('image'), 'uploads');
+                $ext = $request->image->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->image->storeAs('public/uploads',$filename);
+                $institution_approve->background_image = $filename;
+
+            }else{
+                $institution_approve->image =  $institutions->image;
+                $institution_approve->background_image = $institutions->background_image;
+            }
+
+            if ($request->hasFile('logo')) {
+
+                $institution_approve->logo = UploadHelper::imageUpload($request->file('logo'), 'uploads');
+                $ext = $request->logo->extension();
+                $filename = rand(1, 100).time().'.'.$ext;
+
+                $request->logo->storeAs('public/uploads',$filename);
+
+
+            }else {
+                $institution_approve->logo = $institutions->logo;
+            }
+
+            $institution_approve->save();
+            $institution_translate_approve->fill($request->all());
+            $institution_translate_approve->institutions_translate_id = $id;
+            $institution_translate_approve->user_id = auth()->user()->id;
+            // $institutions_translate->video_link = $request->video_link;
+            $institution_translate_approve->save();
+
+            return response()->json(['msg' => 'Institution Update Successfully.']);
         }
 
     }
